@@ -1,0 +1,1951 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel Financeiro & Atividades</title>
+    <style>
+      :root {
+        --bg: #0b1220;
+        --bg-soft: #111b2d;
+        --panel: rgba(17, 27, 45, 0.9);
+        --panel-strong: #172338;
+        --card: #1a2942;
+        --card-alt: #1d3151;
+        --border: rgba(148, 163, 184, 0.18);
+        --primary: #6ee7b7;
+        --primary-strong: #34d399;
+        --accent: #7dd3fc;
+        --warning: #fbbf24;
+        --danger: #f87171;
+        --text: #e5eefb;
+        --muted: #9fb1cf;
+        --success: #86efac;
+        --shadow: 0 18px 45px rgba(15, 23, 42, 0.45);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        background:
+          radial-gradient(circle at top left, rgba(110, 231, 183, 0.12), transparent 16%),
+          radial-gradient(circle at top right, rgba(125, 211, 252, 0.10), transparent 18%),
+          var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        padding: 30px;
+      }
+
+      .container {
+        max-width: 1280px;
+        margin: 0 auto;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 20px 28px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(16px);
+        box-shadow: var(--shadow);
+        animation: enter-from-top 650ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        display: grid;
+        place-items: center;
+        color: #0b1220;
+        font-weight: 800;
+      }
+
+      .brand h1 {
+        margin: 0;
+        font-size: 1.1rem;
+        letter-spacing: 0.04em;
+      }
+
+      .brand-name {
+        margin: 0 0 4px;
+        color: var(--primary);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .pill {
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.02);
+        color: var(--muted);
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-size: 0.82rem;
+      }
+
+      .button {
+        background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+        color: #092339;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 18px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+      }
+
+      .dashboard {
+        margin-top: 24px;
+        display: grid;
+        gap: 24px;
+      }
+
+      .dashboard > section {
+        animation: enter-from-bottom 650ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+
+      .dashboard > section:nth-child(1) { animation-delay: 100ms; }
+      .dashboard > section:nth-child(2) { animation-delay: 200ms; }
+      .dashboard > section:nth-child(3) { animation-delay: 300ms; }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(220px, 1fr));
+        gap: 18px;
+      }
+
+      .card {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        --pointer-x: 50%;
+        --pointer-y: 50%;
+        background: linear-gradient(180deg, rgba(26, 41, 66, 0.96), rgba(16, 24, 39, 0.9));
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+      }
+
+      .card::before {
+        position: absolute;
+        z-index: 0;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(
+          320px circle at var(--pointer-x) var(--pointer-y),
+          rgba(110, 231, 183, 0.13),
+          transparent 70%
+        );
+        content: "";
+        opacity: 0;
+        transition: opacity 220ms ease;
+        pointer-events: none;
+      }
+
+      .card > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .stats-grid > .stat-card {
+        animation: enter-from-bottom 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+
+      .stats-grid > .stat-card:nth-child(1) { animation-delay: 180ms; }
+      .stats-grid > .stat-card:nth-child(2) { animation-delay: 260ms; }
+      .stats-grid > .stat-card:nth-child(3) { animation-delay: 340ms; }
+      .stats-grid > .stat-card:nth-child(4) { animation-delay: 420ms; }
+
+      .edit-button,
+      .edit-actions button {
+        transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+      }
+
+      .activity-item,
+      .task-item,
+      .project-item {
+        transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
+      }
+
+      @keyframes enter-from-top {
+        from { opacity: 0; transform: translateY(-16px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes enter-from-bottom {
+        from { opacity: 0; transform: translateY(18px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+        .card:hover {
+          transform: translateY(-4px);
+          border-color: rgba(110, 231, 183, 0.42);
+          box-shadow: 0 24px 55px rgba(15, 23, 42, 0.55);
+        }
+
+        .card:hover::before {
+          opacity: 1;
+        }
+
+        .button:hover {
+          transform: translateY(-2px) scale(1.02);
+          box-shadow: 0 8px 22px rgba(52, 211, 153, 0.25);
+          filter: brightness(1.06);
+        }
+
+        .edit-button:hover,
+        .edit-actions button:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 5px 14px rgba(110, 231, 183, 0.12);
+        }
+
+        .activity-item:hover,
+        .task-item:hover,
+        .project-item:hover {
+          transform: translateY(-2px);
+          border-color: rgba(125, 211, 252, 0.38);
+          background-color: rgba(255, 255, 255, 0.045);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      .stat-card {
+        padding: 20px 20px 18px;
+      }
+
+      .stat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      .icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-size: 1.1rem;
+      }
+
+      .icon.green { background: rgba(52, 211, 153, 0.12); color: var(--success); }
+      .icon.blue { background: rgba(96, 165, 250, 0.12); color: var(--accent); }
+      .icon.gold { background: rgba(251, 191, 36, 0.12); color: var(--warning); }
+      .icon.red { background: rgba(248, 113, 113, 0.12); color: var(--danger); }
+
+      .stat-value {
+        margin-top: 16px;
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+        font-weight: 800;
+        letter-spacing: -0.05em;
+      }
+
+      .stat-value-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .edit-button,
+      .edit-actions button {
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        padding: 7px 10px;
+        font: inherit;
+        font-size: 0.78rem;
+        cursor: pointer;
+      }
+
+      .edit-button:hover,
+      .edit-actions button:hover {
+        border-color: var(--primary);
+      }
+
+      .stat-editor {
+        margin-top: 12px;
+      }
+
+      .stat-editor input {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        padding: 10px 12px;
+        font: inherit;
+      }
+
+      .edit-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .edit-actions .save-button {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #092339;
+        font-weight: 700;
+      }
+
+      .stat-trend {
+        margin-top: 10px;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      .trend-up { color: var(--success); }
+      .trend-down { color: var(--danger); }
+
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1.65fr 0.95fr;
+        gap: 24px;
+      }
+
+      .panel {
+        padding: 22px;
+      }
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+      }
+
+      .section-title h2 {
+        margin: 0;
+        font-size: 1.05rem;
+      }
+
+      .select {
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.02);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 8px 10px;
+      }
+
+      .calendar {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .calendar-weekday {
+        padding: 8px 2px;
+        color: var(--muted);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-align: center;
+      }
+
+      .calendar-day,
+      .calendar-empty {
+        display: grid;
+        min-height: 48px;
+        place-items: center;
+      }
+
+      .calendar-day {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.025);
+        color: var(--text);
+        font: inherit;
+        cursor: pointer;
+        transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+      }
+
+      .calendar-day:hover {
+        transform: translateY(-2px);
+        border-color: rgba(110, 231, 183, 0.45);
+        background: rgba(110, 231, 183, 0.1);
+      }
+
+      .calendar-day.outside-month {
+        color: var(--muted);
+        opacity: 0.55;
+      }
+
+      .calendar-day.today {
+        border-color: rgba(125, 211, 252, 0.65);
+      }
+
+      .calendar-day.selected {
+        background: var(--primary);
+        color: #092339;
+        font-weight: 800;
+      }
+
+      .calendar-navigation {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .calendar-navigation button {
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        padding: 8px 11px;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .calendar-navigation button:hover {
+        border-color: var(--primary);
+      }
+
+      .calendar-month {
+        min-width: 130px;
+        text-align: center;
+        text-transform: capitalize;
+      }
+
+      .calendar-selection {
+        margin: 16px 0 0;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      .calendar-task-form {
+        display: flex;
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .calendar-task-form input {
+        flex: 1;
+        min-width: 0;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        padding: 10px 12px;
+        font: inherit;
+      }
+
+      .calendar-tasks {
+        display: grid;
+        gap: 8px;
+        margin: 12px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .calendar-task {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.025);
+      }
+
+      .calendar-task-count {
+        display: block;
+        width: 5px;
+        height: 5px;
+        margin-top: 3px;
+        border-radius: 50%;
+        background: var(--primary);
+      }
+
+      @media (max-width: 480px) {
+        .calendar {
+          gap: 4px;
+        }
+
+        .calendar-day,
+        .calendar-empty {
+          min-height: 40px;
+        }
+
+        .calendar-navigation {
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .calendar-task-form {
+          flex-direction: column;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .calendar-day {
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 24px;
+      }
+
+      .project-list, .task-list, .activity-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 14px;
+      }
+
+      .project-item, .task-item, .activity-item {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: rgba(255,255,255,0.02);
+        padding: 14px 14px;
+      }
+
+      .project-head, .task-head, .activity-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .project-name, .task-name {
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .status {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+      }
+
+      .status.active {
+        background: rgba(52, 211, 153, 0.12);
+        border-color: rgba(52, 211, 153, 0.25);
+        color: var(--success);
+      }
+
+      .status.in-review {
+        background: rgba(96, 165, 250, 0.12);
+        border-color: rgba(96, 165, 250, 0.25);
+        color: var(--accent);
+      }
+
+      .status.pending {
+        background: rgba(251, 191, 36, 0.12);
+        border-color: rgba(251, 191, 36, 0.3);
+        color: var(--warning);
+      }
+
+      .status.cancelled {
+        background: rgba(248, 113, 113, 0.12);
+        border-color: rgba(248, 113, 113, 0.25);
+        color: var(--danger);
+      }
+
+      .meta {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        color: var(--muted);
+        font-size: 0.75rem;
+      }
+
+      .project-progress {
+        margin-top: 12px;
+      }
+
+      .project-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 12px;
+      }
+
+      .project-editor,
+      .project-add-form {
+        display: grid;
+        gap: 8px;
+      }
+
+      .project-add-form {
+        margin-bottom: 14px;
+      }
+
+      .project-editor input,
+      .project-editor select,
+      .project-add-form input,
+      .project-add-form select {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        padding: 9px 10px;
+        font: inherit;
+      }
+
+      .project-editor option,
+      .project-add-form option {
+        background: var(--panel-strong);
+        color: var(--text);
+      }
+
+      .project-editor .edit-actions,
+      .project-add-form .edit-actions {
+        margin-top: 0;
+      }
+
+      .progress-track {
+        width: 100%;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.14);
+        overflow: hidden;
+      }
+
+      .progress-bar {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+      }
+
+      .progress-text {
+        margin-top: 8px;
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 0.75rem;
+      }
+
+      .task-item {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .task-copy {
+        flex: 1;
+      }
+
+      .task-copy small {
+        color: var(--muted);
+      }
+
+      .task-check {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        display: grid;
+        place-items: center;
+        color: var(--primary);
+      }
+
+      .pending-editor {
+        grid-column: 1 / -1;
+        display: grid;
+        gap: 8px;
+      }
+
+      .pending-editor input {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        padding: 9px 10px;
+        font: inherit;
+      }
+
+      .pending-editor .edit-actions {
+        margin-top: 0;
+      }
+
+      .pending-add-form {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .pending-add-form input {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        padding: 9px 10px;
+        font: inherit;
+      }
+
+      .pending-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .delete-button {
+        border-color: rgba(248, 113, 113, 0.35);
+        color: var(--danger);
+      }
+
+      .activity-item {
+        display: grid;
+        grid-template-columns: 32px minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .summary-editor {
+        grid-column: 1 / -1;
+        display: grid;
+        gap: 8px;
+      }
+
+      .summary-editor input {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        padding: 9px 10px;
+        font: inherit;
+      }
+
+      .summary-editor .edit-actions {
+        margin-top: 0;
+      }
+
+      .activity-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        background: rgba(110, 231, 183, 0.12);
+        color: var(--primary);
+      }
+
+      .activity-item strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .activity-item small {
+        color: var(--muted);
+      }
+
+      .amount {
+        font-weight: 700;
+        color: var(--success);
+      }
+
+      @media (max-width: 980px) {
+        .stats-grid,
+        .two-col,
+        .main-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 620px) {
+        body {
+          padding: 18px;
+        }
+
+        .topbar {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .top-actions {
+          width: 100%;
+          justify-content: space-between;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">R</div>
+          <div>
+            <p class="brand-name">MX Darck</p>
+            <h1>Resumo de rendimento</h1>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <div class="pill">Últimos 12 meses</div>
+          <button class="button">Exportar relatório</button>
+        </div>
+      </header>
+
+      <main class="dashboard">
+        <section class="stats-grid">
+          <article class="card stat-card">
+            <div class="stat-header">
+              <span>Lucro total</span>
+              <div class="icon green">↗</div>
+            </div>
+            <div class="stat-value-row">
+              <div class="stat-value" id="total-profit">R$ 0,00</div>
+              <button class="edit-button" id="edit-profit" type="button" aria-controls="profit-editor">Editar</button>
+            </div>
+            <form class="profit-editor" id="profit-editor" hidden>
+              <label for="profit-input">Novo lucro total (R$)</label>
+              <input id="profit-input" type="number" min="0" step="0.01" required />
+              <div class="edit-actions">
+                <button class="save-button" type="submit">Salvar</button>
+                <button id="cancel-profit" type="button">Cancelar</button>
+              </div>
+            </form>
+            <div class="stat-trend"><span class="trend-up">+18,4%</span> em relação ao ano passado</div>
+          </article>
+
+          <article class="card stat-card">
+            <div class="stat-header">
+              <span>Faturamento</span>
+              <div class="icon blue">✦</div>
+            </div>
+            <div class="stat-value-row">
+              <div class="stat-value" id="total-revenue">R$ 68.400,00</div>
+              <button class="edit-button" id="edit-revenue" type="button" aria-controls="revenue-editor">Editar</button>
+            </div>
+            <form class="stat-editor" id="revenue-editor" hidden>
+              <label for="revenue-input">Novo faturamento (R$)</label>
+              <input id="revenue-input" type="number" min="0" step="0.01" required />
+              <div class="edit-actions">
+                <button class="save-button" type="submit">Salvar</button>
+                <button id="cancel-revenue" type="button">Cancelar</button>
+              </div>
+            </form>
+            <div class="stat-trend"><span class="trend-up">+12,9%</span> no crescimento mensal</div>
+          </article>
+
+          <article class="card stat-card">
+            <div class="stat-header">
+              <span>Atividades</span>
+              <div class="icon gold">◎</div>
+            </div>
+            <div class="stat-value-row">
+              <div class="stat-value" id="activity-count">32</div>
+              <button class="edit-button" id="edit-activities" type="button" aria-controls="activities-editor">Editar</button>
+            </div>
+            <form class="stat-editor" id="activities-editor" hidden>
+              <label for="activities-input">Quantidade de atividades concluídas</label>
+              <input id="activities-input" type="number" min="0" step="1" required />
+              <div class="edit-actions">
+                <button class="save-button" type="submit">Salvar</button>
+                <button id="cancel-activities" type="button">Cancelar</button>
+              </div>
+            </form>
+            <div class="stat-trend"><span class="trend-up">+7</span> tarefas concluídas este mês</div>
+          </article>
+
+          <article class="card stat-card">
+            <div class="stat-header">
+              <span>Pendentes</span>
+              <div class="icon red">!</div>
+            </div>
+            <div class="stat-value-row">
+              <div class="stat-value" id="pending-count">8</div>
+              <button class="edit-button" id="edit-pending" type="button" aria-controls="pending-editor">Editar</button>
+            </div>
+            <form class="stat-editor" id="pending-editor" hidden>
+              <label for="pending-input">Quantidade de pendências</label>
+              <input id="pending-input" type="number" min="0" step="1" required />
+              <div class="edit-actions">
+                <button class="save-button" type="submit">Salvar</button>
+                <button id="cancel-pending" type="button">Cancelar</button>
+              </div>
+            </form>
+            <div class="stat-trend"><span class="trend-down">-2</span> desde a última revisão</div>
+          </article>
+        </section>
+
+        <section class="main-grid">
+          <article class="card panel">
+            <div class="section-title">
+              <h2>Calendário</h2>
+              <div class="calendar-navigation">
+                <button id="previous-month" type="button" aria-label="Mês anterior">‹</button>
+                <strong class="calendar-month" id="calendar-month" aria-live="polite"></strong>
+                <button id="next-month" type="button" aria-label="Próximo mês">›</button>
+                <button id="current-month" type="button">Hoje</button>
+              </div>
+            </div>
+            <div class="calendar" id="calendar" role="grid" aria-label="Calendário mensal"></div>
+            <p class="calendar-selection" id="calendar-selection" aria-live="polite"></p>
+            <form class="calendar-task-form" id="calendar-task-form">
+              <input id="calendar-task-input" type="text" aria-label="Nova tarefa para a data selecionada" placeholder="Adicionar tarefa para esta data..." required />
+              <button class="button" type="submit">Salvar tarefa</button>
+            </form>
+            <ul class="calendar-tasks" id="calendar-tasks" aria-label="Tarefas da data selecionada"></ul>
+          </article>
+
+          <aside class="card panel">
+            <div class="section-title">
+              <h2>Resumo geral</h2>
+            </div>
+
+            <ul class="activity-list">
+              <li class="activity-item">
+                <div class="activity-icon">✓</div>
+                <div>
+                  <strong>Projeto entregue</strong>
+                  <small>Landing Page para consultoria</small>
+                </div>
+                <div class="amount" data-value="4200">R$ 4.2k</div>
+                <button class="edit-button summary-edit" type="button" aria-label="Editar projeto entregue">Editar</button>
+                <form class="summary-editor" hidden>
+                  <input type="text" aria-label="Título da atividade" placeholder="Título" required />
+                  <input type="text" aria-label="Descrição da atividade" placeholder="Descrição" required />
+                  <input type="number" aria-label="Valor da atividade em reais" placeholder="Valor em reais" min="0" step="0.01" required />
+                  <div class="edit-actions">
+                    <button class="save-button" type="submit">Salvar</button>
+                    <button class="summary-cancel" type="button">Cancelar</button>
+                  </div>
+                </form>
+              </li>
+
+              <li class="activity-item">
+                <div class="activity-icon">↗</div>
+                <div>
+                  <strong>Nova assinatura</strong>
+                  <small>Plano mensal do cliente Atlas</small>
+                </div>
+                <div class="amount" data-value="1600">R$ 1.6k</div>
+                <button class="edit-button summary-edit" type="button" aria-label="Editar nova assinatura">Editar</button>
+                <form class="summary-editor" hidden>
+                  <input type="text" aria-label="Título da atividade" placeholder="Título" required />
+                  <input type="text" aria-label="Descrição da atividade" placeholder="Descrição" required />
+                  <input type="number" aria-label="Valor da atividade em reais" placeholder="Valor em reais" min="0" step="0.01" required />
+                  <div class="edit-actions">
+                    <button class="save-button" type="submit">Salvar</button>
+                    <button class="summary-cancel" type="button">Cancelar</button>
+                  </div>
+                </form>
+              </li>
+
+              <li class="activity-item">
+                <div class="activity-icon">◎</div>
+                <div>
+                  <strong>Revisão de proposta</strong>
+                  <small>Proposta para e-commerce premium</small>
+                </div>
+                <div class="amount" data-value="3800">R$ 3.8k</div>
+                <button class="edit-button summary-edit" type="button" aria-label="Editar revisão de proposta">Editar</button>
+                <form class="summary-editor" hidden>
+                  <input type="text" aria-label="Título da atividade" placeholder="Título" required />
+                  <input type="text" aria-label="Descrição da atividade" placeholder="Descrição" required />
+                  <input type="number" aria-label="Valor da atividade em reais" placeholder="Valor em reais" min="0" step="0.01" required />
+                  <div class="edit-actions">
+                    <button class="save-button" type="submit">Salvar</button>
+                    <button class="summary-cancel" type="button">Cancelar</button>
+                  </div>
+                </form>
+              </li>
+            </ul>
+          </aside>
+        </section>
+
+        <section class="two-col">
+          <article class="card panel">
+            <div class="section-title">
+              <h2>Projetos em andamento</h2>
+              <button class="button" id="add-project" type="button" aria-controls="project-add-form">Adicionar projeto</button>
+            </div>
+
+            <form class="project-add-form" id="project-add-form" hidden>
+              <input id="new-project-name" type="text" aria-label="Nome do projeto" placeholder="Nome do projeto" required />
+              <input id="new-project-client" type="text" aria-label="Cliente do projeto" placeholder="Cliente" required />
+              <input id="new-project-deadline" type="text" aria-label="Prazo do projeto" placeholder="Prazo, por exemplo: 10 dias" required />
+              <select id="new-project-status" aria-label="Status do projeto" required>
+                <option value="active">Ativo</option>
+                <option value="in-review">Em revisão</option>
+                <option value="pending">Pendente</option>
+                <option value="cancelled">Cancelado</option>
+              </select>
+              <input id="new-project-progress" type="number" aria-label="Progresso em porcentagem" placeholder="Progresso (%)" min="0" max="100" step="1" value="0" required />
+              <input id="new-project-amount" type="number" aria-label="Valor do projeto em reais" placeholder="Valor (R$)" min="0" step="0.01" required />
+              <div class="edit-actions">
+                <button class="save-button" type="submit">Salvar projeto</button>
+                <button id="cancel-add-project" type="button">Cancelar</button>
+              </div>
+            </form>
+            <ul class="project-list" id="project-list"></ul>
+          </article>
+
+          <article class="card panel">
+            <div class="section-title">
+              <h2>Pendências</h2>
+              <button class="button" id="add-pending" type="button" aria-controls="add-pending-form">Adicionar pendência</button>
+            </div>
+
+            <form class="pending-add-form" id="add-pending-form" hidden>
+              <input id="new-pending-title" type="text" aria-label="Descrição da nova pendência" placeholder="O que precisa ser feito?" required />
+              <input id="new-pending-due-date" type="text" aria-label="Prazo da nova pendência" placeholder="Prazo, por exemplo: sexta-feira" required />
+              <div class="edit-actions">
+                <button class="save-button" type="submit">Adicionar</button>
+                <button id="cancel-add-pending" type="button">Cancelar</button>
+              </div>
+            </form>
+            <ul class="task-list" id="pending-tasks"></ul>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const formatCurrency = value => value.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
+
+      const profitZeroedKey = 'dashboard-profit-zeroed-v1';
+      if (localStorage.getItem(profitZeroedKey) !== 'true') {
+        localStorage.setItem('dashboard-total-profit', '0');
+        localStorage.setItem(profitZeroedKey, 'true');
+      }
+
+      const makeEditableMetric = ({ displayId, buttonId, formId, inputId, cancelButtonId, storageKey, initialValue, formatValue, step, onChange }) => {
+        const display = document.getElementById(displayId);
+        const editButton = document.getElementById(buttonId);
+        const form = document.getElementById(formId);
+        const input = document.getElementById(inputId);
+        const cancelButton = document.getElementById(cancelButtonId);
+        const storedValue = localStorage.getItem(storageKey);
+        let value = storedValue === null ? initialValue : Number(storedValue);
+
+        if (!Number.isFinite(value) || value < 0 || (step === 1 && !Number.isInteger(value))) {
+          value = initialValue;
+        }
+
+        const render = () => {
+          display.textContent = formatValue(value);
+        };
+
+        const closeEditor = () => {
+          form.hidden = true;
+          editButton.hidden = false;
+        };
+
+        render();
+
+        editButton.addEventListener('click', () => {
+          input.value = String(value);
+          form.hidden = false;
+          editButton.hidden = true;
+          input.focus();
+        });
+
+        cancelButton.addEventListener('click', closeEditor);
+
+        form.addEventListener('submit', event => {
+          event.preventDefault();
+          const updatedValue = Number(input.value);
+
+          if (!Number.isFinite(updatedValue) || updatedValue < 0 || (step === 1 && !Number.isInteger(updatedValue))) {
+            input.reportValidity();
+            return;
+          }
+
+          value = updatedValue;
+          localStorage.setItem(storageKey, String(value));
+          render();
+          if (onChange) onChange(value);
+          closeEditor();
+        });
+      };
+
+      makeEditableMetric({
+        displayId: 'total-profit',
+        buttonId: 'edit-profit',
+        formId: 'profit-editor',
+        inputId: 'profit-input',
+        cancelButtonId: 'cancel-profit',
+        storageKey: 'dashboard-total-profit',
+        initialValue: 0,
+        formatValue: formatCurrency,
+        step: 0.01
+      });
+
+      makeEditableMetric({
+        displayId: 'total-revenue',
+        buttonId: 'edit-revenue',
+        formId: 'revenue-editor',
+        inputId: 'revenue-input',
+        cancelButtonId: 'cancel-revenue',
+        storageKey: 'dashboard-total-revenue',
+        initialValue: 68400,
+        formatValue: formatCurrency,
+        step: 0.01
+      });
+
+      makeEditableMetric({
+        displayId: 'activity-count',
+        buttonId: 'edit-activities',
+        formId: 'activities-editor',
+        inputId: 'activities-input',
+        cancelButtonId: 'cancel-activities',
+        storageKey: 'dashboard-activity-count',
+        initialValue: 32,
+        formatValue: value => value.toLocaleString('pt-BR'),
+        step: 1
+      });
+
+      makeEditableMetric({
+        displayId: 'pending-count',
+        buttonId: 'edit-pending',
+        formId: 'pending-editor',
+        inputId: 'pending-input',
+        cancelButtonId: 'cancel-pending',
+        storageKey: 'dashboard-pending-count',
+        initialValue: 8,
+        formatValue: value => value.toLocaleString('pt-BR'),
+        step: 1
+      });
+
+      const projectList = document.getElementById('project-list');
+      const projectStorageKey = 'dashboard-projects';
+      const addProjectButton = document.getElementById('add-project');
+      const projectAddForm = document.getElementById('project-add-form');
+      const cancelAddProjectButton = document.getElementById('cancel-add-project');
+      const newProjectName = document.getElementById('new-project-name');
+      const newProjectClient = document.getElementById('new-project-client');
+      const newProjectDeadline = document.getElementById('new-project-deadline');
+      const newProjectStatus = document.getElementById('new-project-status');
+      const newProjectProgress = document.getElementById('new-project-progress');
+      const newProjectAmount = document.getElementById('new-project-amount');
+      const initialProjects = [
+        { id: 'consultoria', name: 'Plataforma de consultoria', client: 'Nova Era', deadline: '12 dias', status: 'active', progress: 72, amount: 9800 },
+        { id: 'shopify', name: 'Shopify premium', client: 'Luma Studio', deadline: '5 dias', status: 'in-review', progress: 88, amount: 12600 },
+        { id: 'institucional', name: 'Site institucional', client: 'Verde Mente', deadline: '18 dias', status: 'pending', progress: 46, amount: 5300 }
+      ];
+      const validProjectStatuses = ['active', 'in-review', 'pending', 'cancelled'];
+      const projectStatusLabels = {
+        active: 'Ativo',
+        'in-review': 'Em revisão',
+        pending: 'Pendente',
+        cancelled: 'Cancelado'
+      };
+      let projects = initialProjects;
+      let editingProjectId = null;
+      const storedProjects = localStorage.getItem(projectStorageKey);
+
+      if (storedProjects !== null) {
+        try {
+          const parsedProjects = JSON.parse(storedProjects);
+          if (Array.isArray(parsedProjects) && parsedProjects.every(project =>
+            project &&
+            typeof project.id === 'string' &&
+            typeof project.name === 'string' &&
+            typeof project.client === 'string' &&
+            typeof project.deadline === 'string' &&
+            validProjectStatuses.includes(project.status) &&
+            Number.isInteger(project.progress) &&
+            project.progress >= 0 &&
+            project.progress <= 100 &&
+            Number.isFinite(project.amount) &&
+            project.amount >= 0
+          )) {
+            projects = parsedProjects;
+          } else {
+            console.error('Os projetos salvos estão em formato inválido. Os projetos iniciais foram carregados.');
+          }
+        } catch (error) {
+          console.error('Não foi possível ler os projetos salvos. Os projetos iniciais foram carregados.', error);
+        }
+      }
+
+      const saveProjects = () => {
+        localStorage.setItem(projectStorageKey, JSON.stringify(projects));
+      };
+
+      const renderProjects = () => {
+        projectList.replaceChildren();
+
+        if (projects.length === 0) {
+          const emptyState = document.createElement('li');
+          emptyState.className = 'project-item';
+          emptyState.textContent = 'Nenhum projeto cadastrado.';
+          projectList.appendChild(emptyState);
+          return;
+        }
+
+        projects.forEach(project => {
+          const item = document.createElement('li');
+          item.className = 'project-item';
+
+          const header = document.createElement('div');
+          header.className = 'project-head';
+          const name = document.createElement('p');
+          name.className = 'project-name';
+          name.textContent = project.name;
+          const status = document.createElement('span');
+          status.className = `status ${project.status}`;
+          status.textContent = projectStatusLabels[project.status];
+          header.append(name, status);
+
+          const meta = document.createElement('div');
+          meta.className = 'meta';
+          const client = document.createElement('span');
+          client.textContent = `Cliente: ${project.client}`;
+          const deadline = document.createElement('span');
+          deadline.textContent = `Prazo: ${project.deadline}`;
+          meta.append(client, deadline);
+
+          const progress = document.createElement('div');
+          progress.className = 'project-progress';
+          const progressTrack = document.createElement('div');
+          progressTrack.className = 'progress-track';
+          const progressBar = document.createElement('div');
+          progressBar.className = 'progress-bar';
+          progressBar.style.width = `${project.progress}%`;
+          progressTrack.appendChild(progressBar);
+
+          const progressText = document.createElement('div');
+          progressText.className = 'progress-text';
+          const progressLabel = document.createElement('span');
+          progressLabel.textContent = `${project.progress}% concluído`;
+          const amount = document.createElement('span');
+          amount.textContent = formatCurrency(project.amount);
+          progressText.append(progressLabel, amount);
+          progress.append(progressTrack, progressText);
+
+          item.append(header, meta, progress);
+
+          if (editingProjectId === project.id) {
+            const form = document.createElement('form');
+            form.className = 'project-editor';
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.required = true;
+            nameInput.value = project.name;
+            nameInput.setAttribute('aria-label', 'Nome do projeto');
+
+            const clientInput = document.createElement('input');
+            clientInput.type = 'text';
+            clientInput.required = true;
+            clientInput.value = project.client;
+            clientInput.setAttribute('aria-label', 'Cliente');
+
+            const deadlineInput = document.createElement('input');
+            deadlineInput.type = 'text';
+            deadlineInput.required = true;
+            deadlineInput.value = project.deadline;
+            deadlineInput.setAttribute('aria-label', 'Prazo do projeto');
+
+            const statusSelect = document.createElement('select');
+            statusSelect.setAttribute('aria-label', 'Status do projeto');
+            validProjectStatuses.forEach(statusValue => {
+              const option = document.createElement('option');
+              option.value = statusValue;
+              option.textContent = projectStatusLabels[statusValue];
+              statusSelect.appendChild(option);
+            });
+            statusSelect.value = project.status;
+
+            const progressInput = document.createElement('input');
+            progressInput.type = 'number';
+            progressInput.min = '0';
+            progressInput.max = '100';
+            progressInput.step = '1';
+            progressInput.required = true;
+            progressInput.value = String(project.progress);
+            progressInput.setAttribute('aria-label', 'Progresso em porcentagem');
+
+            const amountInput = document.createElement('input');
+            amountInput.type = 'number';
+            amountInput.min = '0';
+            amountInput.step = '0.01';
+            amountInput.required = true;
+            amountInput.value = String(project.amount);
+            amountInput.setAttribute('aria-label', 'Valor do projeto em reais');
+
+            const actions = document.createElement('div');
+            actions.className = 'edit-actions';
+            const saveButton = document.createElement('button');
+            saveButton.className = 'save-button';
+            saveButton.type = 'submit';
+            saveButton.textContent = 'Salvar';
+            const cancelButton = document.createElement('button');
+            cancelButton.type = 'button';
+            cancelButton.textContent = 'Cancelar';
+            cancelButton.addEventListener('click', () => {
+              editingProjectId = null;
+              renderProjects();
+            });
+            actions.append(saveButton, cancelButton);
+            form.append(nameInput, clientInput, deadlineInput, statusSelect, progressInput, amountInput, actions);
+
+            form.addEventListener('submit', event => {
+              event.preventDefault();
+              const updatedName = nameInput.value.trim();
+              const updatedClient = clientInput.value.trim();
+              const updatedDeadline = deadlineInput.value.trim();
+              const updatedProgress = Number(progressInput.value);
+              const updatedAmount = Number(amountInput.value);
+
+              if (!updatedName || !updatedClient || !updatedDeadline) {
+                const emptyInput = !updatedName ? nameInput : !updatedClient ? clientInput : deadlineInput;
+                emptyInput.setCustomValidity('Preencha este campo.');
+                emptyInput.reportValidity();
+                emptyInput.setCustomValidity('');
+                return;
+              }
+              if (!Number.isInteger(updatedProgress) || updatedProgress < 0 || updatedProgress > 100) {
+                progressInput.reportValidity();
+                return;
+              }
+              if (!Number.isFinite(updatedAmount) || updatedAmount < 0) {
+                amountInput.reportValidity();
+                return;
+              }
+
+              project.name = updatedName;
+              project.client = updatedClient;
+              project.deadline = updatedDeadline;
+              project.status = statusSelect.value;
+              project.progress = updatedProgress;
+              project.amount = updatedAmount;
+              saveProjects();
+              editingProjectId = null;
+              renderProjects();
+            });
+
+            item.appendChild(form);
+          } else {
+            const actions = document.createElement('div');
+            actions.className = 'project-actions';
+            const editButton = document.createElement('button');
+            editButton.className = 'edit-button';
+            editButton.type = 'button';
+            editButton.textContent = 'Editar';
+            editButton.setAttribute('aria-label', `Editar projeto: ${project.name}`);
+            editButton.addEventListener('click', () => {
+              editingProjectId = project.id;
+              renderProjects();
+            });
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'edit-button delete-button';
+            deleteButton.type = 'button';
+            deleteButton.textContent = 'Excluir';
+            deleteButton.setAttribute('aria-label', `Excluir projeto: ${project.name}`);
+            deleteButton.addEventListener('click', () => {
+              if (!window.confirm(`Excluir o projeto "${project.name}"?`)) return;
+              projects = projects.filter(item => item.id !== project.id);
+              saveProjects();
+              renderProjects();
+            });
+            actions.append(editButton, deleteButton);
+            item.appendChild(actions);
+          }
+
+          projectList.appendChild(item);
+        });
+      };
+
+      addProjectButton.addEventListener('click', () => {
+        projectAddForm.hidden = false;
+        addProjectButton.hidden = true;
+        newProjectName.focus();
+      });
+
+      cancelAddProjectButton.addEventListener('click', () => {
+        projectAddForm.reset();
+        newProjectProgress.value = '0';
+        projectAddForm.hidden = true;
+        addProjectButton.hidden = false;
+      });
+
+      projectAddForm.addEventListener('submit', event => {
+        event.preventDefault();
+        const name = newProjectName.value.trim();
+        const client = newProjectClient.value.trim();
+        const deadline = newProjectDeadline.value.trim();
+        const progress = Number(newProjectProgress.value);
+        const amount = Number(newProjectAmount.value);
+
+        if (!name || !client || !deadline) {
+          const emptyInput = !name ? newProjectName : !client ? newProjectClient : newProjectDeadline;
+          emptyInput.setCustomValidity('Preencha este campo.');
+          emptyInput.reportValidity();
+          emptyInput.setCustomValidity('');
+          return;
+        }
+        if (!Number.isInteger(progress) || progress < 0 || progress > 100) {
+          newProjectProgress.reportValidity();
+          return;
+        }
+        if (!Number.isFinite(amount) || amount < 0) {
+          newProjectAmount.reportValidity();
+          return;
+        }
+
+        projects.push({
+          id: `project-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          name,
+          client,
+          deadline,
+          status: newProjectStatus.value,
+          progress,
+          amount
+        });
+        saveProjects();
+        editingProjectId = null;
+        renderProjects();
+        projectAddForm.reset();
+        newProjectProgress.value = '0';
+        projectAddForm.hidden = true;
+        addProjectButton.hidden = false;
+      });
+
+      renderProjects();
+
+      document.querySelectorAll('.activity-item').forEach((item, index) => {
+        const title = item.querySelector('strong');
+        const description = item.querySelector('small');
+        const amount = item.querySelector('.amount');
+        const editButton = item.querySelector('.summary-edit');
+        const form = item.querySelector('.summary-editor');
+        const cancelButton = item.querySelector('.summary-cancel');
+        const [titleInput, descriptionInput, amountInput] = form.querySelectorAll('input');
+        const storagePrefix = `dashboard-summary-${index}`;
+
+        const savedTitle = localStorage.getItem(`${storagePrefix}-title`);
+        const savedDescription = localStorage.getItem(`${storagePrefix}-description`);
+        const savedAmount = localStorage.getItem(`${storagePrefix}-amount`);
+
+        if (savedTitle !== null) title.textContent = savedTitle;
+        if (savedDescription !== null) description.textContent = savedDescription;
+        if (savedAmount !== null && Number.isFinite(Number(savedAmount)) && Number(savedAmount) >= 0) {
+          amount.textContent = formatCurrency(Number(savedAmount));
+          amount.dataset.value = savedAmount;
+        }
+
+        const closeEditor = () => {
+          form.hidden = true;
+          editButton.hidden = false;
+        };
+
+        editButton.addEventListener('click', () => {
+          titleInput.value = title.textContent;
+          descriptionInput.value = description.textContent;
+          amountInput.value = amount.dataset.value;
+          form.hidden = false;
+          editButton.hidden = true;
+          titleInput.focus();
+        });
+
+        cancelButton.addEventListener('click', closeEditor);
+
+        form.addEventListener('submit', event => {
+          event.preventDefault();
+          const updatedAmount = Number(amountInput.value);
+
+          if (!titleInput.value.trim() || !descriptionInput.value.trim()) {
+            const emptyInput = !titleInput.value.trim() ? titleInput : descriptionInput;
+            emptyInput.setCustomValidity('Preencha este campo.');
+            emptyInput.reportValidity();
+            emptyInput.setCustomValidity('');
+            return;
+          }
+
+          if (!Number.isFinite(updatedAmount) || updatedAmount < 0) {
+            amountInput.reportValidity();
+            return;
+          }
+
+          title.textContent = titleInput.value.trim();
+          description.textContent = descriptionInput.value.trim();
+          amount.textContent = formatCurrency(updatedAmount);
+          amount.dataset.value = String(updatedAmount);
+          localStorage.setItem(`${storagePrefix}-title`, title.textContent);
+          localStorage.setItem(`${storagePrefix}-description`, description.textContent);
+          localStorage.setItem(`${storagePrefix}-amount`, String(updatedAmount));
+          closeEditor();
+        });
+      });
+
+      const pendingTasksList = document.getElementById('pending-tasks');
+      const addPendingButton = document.getElementById('add-pending');
+      const addPendingForm = document.getElementById('add-pending-form');
+      const newPendingTitle = document.getElementById('new-pending-title');
+      const newPendingDueDate = document.getElementById('new-pending-due-date');
+      const cancelAddPendingButton = document.getElementById('cancel-add-pending');
+      const initialPendingTasks = [
+        { id: '0', title: 'Enviar proposta para cliente H', dueDate: 'Hoje · 15:30' },
+        { id: '1', title: 'Ajustar orçamento do projeto', dueDate: 'Quinta · 11:00' },
+        { id: '2', title: 'Revisar contrato cliente Nova Era', dueDate: 'Próximo 2 dias' },
+        { id: '3', title: 'Retomar feedback de design', dueDate: 'Próximo 3 dias' }
+      ].map(task => {
+        const savedTitle = localStorage.getItem(`dashboard-pending-task-${task.id}-title`);
+        const savedDueDate = localStorage.getItem(`dashboard-pending-task-${task.id}-due-date`);
+        return {
+          ...task,
+          title: savedTitle === null ? task.title : savedTitle,
+          dueDate: savedDueDate === null ? task.dueDate : savedDueDate
+        };
+      });
+      const savedPendingTasks = localStorage.getItem('dashboard-pending-tasks');
+      let pendingTasks = initialPendingTasks;
+      let nextPendingTaskId = 4;
+      let editingPendingTaskId = null;
+
+      if (savedPendingTasks !== null) {
+        try {
+          const parsedTasks = JSON.parse(savedPendingTasks);
+          if (Array.isArray(parsedTasks) && parsedTasks.every(task =>
+            task &&
+            typeof task.id === 'string' &&
+            typeof task.title === 'string' &&
+            typeof task.dueDate === 'string'
+          )) {
+            pendingTasks = parsedTasks;
+            nextPendingTaskId = pendingTasks.reduce((nextId, task) => {
+              const numericId = Number(task.id);
+              return Number.isInteger(numericId) ? Math.max(nextId, numericId + 1) : nextId;
+            }, 4);
+          } else {
+            console.error('A lista salva de pendências está em formato inválido. Os itens iniciais foram carregados.');
+          }
+        } catch (error) {
+          console.error('Não foi possível ler as pendências salvas. Os itens iniciais foram carregados.', error);
+        }
+      }
+
+      const savePendingTasks = () => {
+        localStorage.setItem('dashboard-pending-tasks', JSON.stringify(pendingTasks));
+      };
+
+      const adjustPendingCount = change => {
+        const storedCount = Number(localStorage.getItem('dashboard-pending-count') ?? 8);
+        const currentCount = Number.isInteger(storedCount) && storedCount >= 0 ? storedCount : 8;
+        const updatedCount = Math.max(0, currentCount + change);
+        localStorage.setItem('dashboard-pending-count', String(updatedCount));
+        document.getElementById('pending-count').textContent = updatedCount.toLocaleString('pt-BR');
+      };
+
+      const renderPendingTasks = () => {
+        pendingTasksList.replaceChildren();
+
+        if (pendingTasks.length === 0) {
+          const emptyState = document.createElement('li');
+          emptyState.className = 'project-item';
+          emptyState.textContent = 'Nenhuma pendência no momento.';
+          pendingTasksList.appendChild(emptyState);
+          return;
+        }
+
+        pendingTasks.forEach(task => {
+          const item = document.createElement('li');
+          item.className = 'task-item';
+
+          const copy = document.createElement('div');
+          copy.className = 'task-copy';
+          const title = document.createElement('p');
+          title.className = 'task-name';
+          title.textContent = task.title;
+          const dueDate = document.createElement('small');
+          dueDate.textContent = task.dueDate;
+          copy.append(title, dueDate);
+
+          const actions = document.createElement('div');
+          actions.className = 'pending-actions';
+
+          const editButton = document.createElement('button');
+          editButton.className = 'edit-button';
+          editButton.type = 'button';
+          editButton.textContent = 'Editar';
+          editButton.setAttribute('aria-label', `Editar: ${task.title}`);
+          editButton.addEventListener('click', () => {
+            editingPendingTaskId = task.id;
+            renderPendingTasks();
+          });
+
+          const deleteButton = document.createElement('button');
+          deleteButton.className = 'edit-button delete-button';
+          deleteButton.type = 'button';
+          deleteButton.textContent = 'Excluir';
+          deleteButton.setAttribute('aria-label', `Excluir: ${task.title}`);
+          deleteButton.addEventListener('click', () => {
+            if (!window.confirm(`Excluir a pendência "${task.title}"?`)) return;
+            pendingTasks = pendingTasks.filter(pendingTask => pendingTask.id !== task.id);
+            savePendingTasks();
+            adjustPendingCount(-1);
+            renderPendingTasks();
+          });
+
+          actions.append(editButton, deleteButton);
+          item.append(copy, actions);
+
+          if (editingPendingTaskId === task.id) {
+            const editor = document.createElement('form');
+            editor.className = 'pending-editor';
+            const titleInput = document.createElement('input');
+            titleInput.type = 'text';
+            titleInput.required = true;
+            titleInput.value = task.title;
+            titleInput.setAttribute('aria-label', 'Descrição da pendência');
+            const dueDateInput = document.createElement('input');
+            dueDateInput.type = 'text';
+            dueDateInput.required = true;
+            dueDateInput.value = task.dueDate;
+            dueDateInput.setAttribute('aria-label', 'Prazo da pendência');
+            const editorActions = document.createElement('div');
+            editorActions.className = 'edit-actions';
+            const saveButton = document.createElement('button');
+            saveButton.className = 'save-button';
+            saveButton.type = 'submit';
+            saveButton.textContent = 'Salvar';
+            const cancelButton = document.createElement('button');
+            cancelButton.type = 'button';
+            cancelButton.textContent = 'Cancelar';
+            cancelButton.addEventListener('click', () => {
+              editingPendingTaskId = null;
+              renderPendingTasks();
+            });
+            editorActions.append(saveButton, cancelButton);
+            editor.append(titleInput, dueDateInput, editorActions);
+            editor.addEventListener('submit', event => {
+              event.preventDefault();
+              const updatedTitle = titleInput.value.trim();
+              const updatedDueDate = dueDateInput.value.trim();
+              if (!updatedTitle || !updatedDueDate) {
+                const emptyInput = !updatedTitle ? titleInput : dueDateInput;
+                emptyInput.setCustomValidity('Preencha este campo.');
+                emptyInput.reportValidity();
+                emptyInput.setCustomValidity('');
+                return;
+              }
+              task.title = updatedTitle;
+              task.dueDate = updatedDueDate;
+              savePendingTasks();
+              editingPendingTaskId = null;
+              renderPendingTasks();
+            });
+            item.appendChild(editor);
+          }
+
+          pendingTasksList.appendChild(item);
+        });
+      };
+
+      addPendingButton.addEventListener('click', () => {
+        addPendingForm.hidden = false;
+        addPendingButton.hidden = true;
+        newPendingTitle.focus();
+      });
+
+      cancelAddPendingButton.addEventListener('click', () => {
+        addPendingForm.reset();
+        addPendingForm.hidden = true;
+        addPendingButton.hidden = false;
+      });
+
+      addPendingForm.addEventListener('submit', event => {
+        event.preventDefault();
+        const title = newPendingTitle.value.trim();
+        const dueDate = newPendingDueDate.value.trim();
+        if (!title || !dueDate) {
+          const emptyInput = !title ? newPendingTitle : newPendingDueDate;
+          emptyInput.setCustomValidity('Preencha este campo.');
+          emptyInput.reportValidity();
+          emptyInput.setCustomValidity('');
+          return;
+        }
+
+        pendingTasks.push({
+          id: String(nextPendingTaskId++),
+          title,
+          dueDate
+        });
+        savePendingTasks();
+        adjustPendingCount(1);
+        renderPendingTasks();
+        addPendingForm.reset();
+        addPendingForm.hidden = true;
+        addPendingButton.hidden = false;
+      });
+
+      renderPendingTasks();
+
+      const calendarElement = document.getElementById('calendar');
+      const calendarMonth = document.getElementById('calendar-month');
+      const calendarSelection = document.getElementById('calendar-selection');
+      const calendarTaskForm = document.getElementById('calendar-task-form');
+      const calendarTaskInput = document.getElementById('calendar-task-input');
+      const calendarTasksList = document.getElementById('calendar-tasks');
+      const currentDate = new Date();
+      let visibleYear = currentDate.getFullYear();
+      let visibleMonth = currentDate.getMonth();
+      let selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+      const weekdayLabels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+      const calendarTasksStorageKey = 'dashboard-calendar-tasks';
+      const storedCalendarTasks = localStorage.getItem(calendarTasksStorageKey);
+      let calendarTasks = [];
+
+      if (storedCalendarTasks !== null) {
+        try {
+          const parsedCalendarTasks = JSON.parse(storedCalendarTasks);
+          if (Array.isArray(parsedCalendarTasks) && parsedCalendarTasks.every(task =>
+            task &&
+            typeof task.id === 'string' &&
+            typeof task.date === 'string' &&
+            /^\d{4}-\d{2}-\d{2}$/.test(task.date) &&
+            typeof task.text === 'string'
+          )) {
+            calendarTasks = parsedCalendarTasks;
+          } else {
+            console.error('As tarefas salvas do calendário estão em formato inválido. A lista foi iniciada vazia.');
+          }
+        } catch (error) {
+          console.error('Não foi possível ler as tarefas salvas do calendário. A lista foi iniciada vazia.', error);
+        }
+      }
+
+      const getDateKey = date => [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0')
+      ].join('-');
+
+      const saveCalendarTasks = () => {
+        localStorage.setItem(calendarTasksStorageKey, JSON.stringify(calendarTasks));
+      };
+
+      const renderCalendarTasks = () => {
+        const selectedDateKey = getDateKey(selectedDate);
+        calendarTasksList.replaceChildren();
+        const selectedTasks = calendarTasks.filter(task => task.date === selectedDateKey);
+
+        if (selectedTasks.length === 0) {
+          const emptyMessage = document.createElement('li');
+          emptyMessage.className = 'calendar-selection';
+          emptyMessage.textContent = 'Nenhuma tarefa nesta data.';
+          calendarTasksList.appendChild(emptyMessage);
+          return;
+        }
+
+        selectedTasks.forEach(task => {
+          const item = document.createElement('li');
+          item.className = 'calendar-task';
+          const taskText = document.createElement('span');
+          taskText.textContent = task.text;
+          const deleteButton = document.createElement('button');
+          deleteButton.type = 'button';
+          deleteButton.className = 'edit-button delete-button';
+          deleteButton.textContent = 'Excluir';
+          deleteButton.setAttribute('aria-label', `Excluir tarefa: ${task.text}`);
+          deleteButton.addEventListener('click', () => {
+            calendarTasks = calendarTasks.filter(calendarTask => calendarTask.id !== task.id);
+            saveCalendarTasks();
+            renderCalendar();
+          });
+          item.append(taskText, deleteButton);
+          calendarTasksList.appendChild(item);
+        });
+      };
+
+      const renderCalendar = () => {
+        const monthDate = new Date(visibleYear, visibleMonth, 1);
+        calendarMonth.textContent = monthDate.toLocaleDateString('pt-BR', {
+          month: 'long',
+          year: 'numeric'
+        });
+        calendarElement.replaceChildren();
+
+        weekdayLabels.forEach(day => {
+          const weekday = document.createElement('div');
+          weekday.className = 'calendar-weekday';
+          weekday.setAttribute('role', 'columnheader');
+          weekday.textContent = day;
+          calendarElement.appendChild(weekday);
+        });
+
+        const firstWeekday = (monthDate.getDay() + 6) % 7;
+        const daysInMonth = new Date(visibleYear, visibleMonth + 1, 0).getDate();
+        const totalCells = Math.ceil((firstWeekday + daysInMonth) / 7) * 7;
+
+        for (let cellIndex = 0; cellIndex < totalCells; cellIndex += 1) {
+          const dayNumber = cellIndex - firstWeekday + 1;
+          if (dayNumber < 1 || dayNumber > daysInMonth) {
+            const emptyDay = document.createElement('div');
+            emptyDay.className = 'calendar-empty';
+            emptyDay.setAttribute('role', 'gridcell');
+            calendarElement.appendChild(emptyDay);
+            continue;
+          }
+
+          const dayDate = new Date(visibleYear, visibleMonth, dayNumber);
+          const dayButton = document.createElement('button');
+          dayButton.type = 'button';
+          dayButton.className = 'calendar-day';
+          dayButton.setAttribute('role', 'gridcell');
+          dayButton.textContent = String(dayNumber);
+          dayButton.setAttribute('aria-label', dayDate.toLocaleDateString('pt-BR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          }));
+
+          if (
+            dayDate.getFullYear() === currentDate.getFullYear() &&
+            dayDate.getMonth() === currentDate.getMonth() &&
+            dayDate.getDate() === currentDate.getDate()
+          ) {
+            dayButton.classList.add('today');
+            dayButton.setAttribute('aria-current', 'date');
+          }
+
+          if (
+            dayDate.getFullYear() === selectedDate.getFullYear() &&
+            dayDate.getMonth() === selectedDate.getMonth() &&
+            dayDate.getDate() === selectedDate.getDate()
+          ) {
+            dayButton.classList.add('selected');
+            dayButton.setAttribute('aria-pressed', 'true');
+          } else {
+            dayButton.setAttribute('aria-pressed', 'false');
+          }
+
+          const taskCount = calendarTasks.filter(task => task.date === getDateKey(dayDate)).length;
+          if (taskCount > 0) {
+            const taskIndicator = document.createElement('span');
+            taskIndicator.className = 'calendar-task-count';
+            dayButton.appendChild(taskIndicator);
+            dayButton.setAttribute('aria-label', `${dayButton.getAttribute('aria-label')}, ${taskCount} ${taskCount === 1 ? 'tarefa' : 'tarefas'}`);
+          }
+
+          dayButton.addEventListener('click', () => {
+            selectedDate = dayDate;
+            renderCalendar();
+          });
+          calendarElement.appendChild(dayButton);
+        }
+
+        calendarSelection.textContent = `Data selecionada: ${selectedDate.toLocaleDateString('pt-BR', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        })}`;
+        renderCalendarTasks();
+      };
+
+      calendarTaskForm.addEventListener('submit', event => {
+        event.preventDefault();
+        const taskText = calendarTaskInput.value.trim();
+
+        if (!taskText) {
+          calendarTaskInput.setCustomValidity('Digite uma tarefa.');
+          calendarTaskInput.reportValidity();
+          calendarTaskInput.setCustomValidity('');
+          return;
+        }
+
+        calendarTasks.push({
+          id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          date: getDateKey(selectedDate),
+          text: taskText
+        });
+        saveCalendarTasks();
+        calendarTaskForm.reset();
+        renderCalendar();
+        calendarTaskInput.focus();
+      });
+
+      document.getElementById('previous-month').addEventListener('click', () => {
+        visibleMonth -= 1;
+        if (visibleMonth < 0) {
+          visibleMonth = 11;
+          visibleYear -= 1;
+        }
+        selectedDate = new Date(visibleYear, visibleMonth, 1);
+        renderCalendar();
+      });
+
+      document.getElementById('next-month').addEventListener('click', () => {
+        visibleMonth += 1;
+        if (visibleMonth > 11) {
+          visibleMonth = 0;
+          visibleYear += 1;
+        }
+        selectedDate = new Date(visibleYear, visibleMonth, 1);
+        renderCalendar();
+      });
+
+      document.getElementById('current-month').addEventListener('click', () => {
+        visibleYear = currentDate.getFullYear();
+        visibleMonth = currentDate.getMonth();
+        selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+        renderCalendar();
+      });
+
+      renderCalendar();
+
+      document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('pointermove', event => {
+          if (event.pointerType !== 'mouse') return;
+          const bounds = card.getBoundingClientRect();
+          card.style.setProperty('--pointer-x', `${event.clientX - bounds.left}px`);
+          card.style.setProperty('--pointer-y', `${event.clientY - bounds.top}px`);
+        });
+      });
+    </script>
+  </body>
+</html>
